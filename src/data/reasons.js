@@ -1,6 +1,11 @@
 // src/data/reasons.js
-// 27 reasons — one for each year of her life
-export const reasons = [
+// ─── Re-exports from private config ──────────────────────────────────────────
+// All content lives in config.js (gitignored). Edit that file to customise.
+import { CONFIG } from './config'
+export const reasons = CONFIG.reasons
+
+// ── Legacy data kept below for reference only — no longer used ───────────────
+const _reasons_UNUSED = [
   {
     id: 1,
     emoji: "💫",

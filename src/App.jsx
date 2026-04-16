@@ -16,8 +16,8 @@ import Final    from './components/Final'
 // ── Floating Nav (shows after hero is dismissed) ──────────────────────────────
 function FloatingNav() {
   const links = [
-    { href: '#timeline', label: 'Journey' },
-    { href: '#gallery',  label: 'Gallery' },
+    // { href: '#timeline', label: 'Journey' },
+    // { href: '#gallery',  label: 'Gallery' },
     { href: '#reasons',  label: 'Reasons' },
     { href: '#letter',   label: 'Letter' },
     { href: '#final',    label: 'Final' },
@@ -96,8 +96,8 @@ export default function App() {
             {/* Sections */}
             <main id="main-content">
               <section id="timeline-anchor" />
-              <Timeline />
-              <Gallery />
+              {/* <Timeline /> */}
+              {/* <Gallery /> */}
               <Reasons />
               <Letter />
               <Final onReplay={handleReplay} />

@@ -3,67 +3,51 @@
 // Animated typing effect that reveals the letter paragraph by paragraph
 // when the section scrolls into view.
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { CONFIG } from '../data/config'
 
 // ── Letter paragraphs ─────────────────────────────────────────────────────────
-// Personalise these to your heart's content!
-const LETTER_PARAGRAPHS = [
-  "To my favourite person in the world,",
-  "I have been trying to find the right words for this — and honestly, twelve years of memories can't fit into a letter. But I'll try anyway, because you deserve every word.",
-  "I remember the exact moment I knew you were different. Not just a friend, but the kind of friend that life gives you once, if you're lucky. And I got lucky.",
-  "You have been there on my worst days without being asked. You've celebrated my smallest wins like they were the biggest deals on earth. You've laughed with me, cried with me, stayed up with me, and talked me out of my own head more times than I can count.",
-  "Watching you grow into the woman you are at 27 — confident, kind, luminous — is one of the greatest gifts I have ever received. Not because I helped shape it, but because I got a front-row seat.",
-  "I am so proud of you. For every hard thing you faced and didn't let break you. For every time you chose yourself. For every small brave decision that nobody saw but mattered.",
-  "Here's to 27. Here's to everything that's coming. And here's to us — still doing this, still laughing too loud, still showing up for each other.",
-  "Happy Birthday. I love you endlessly. This friendship is my forever. 💕",
-  "— Always yours ✨",
-]
+// Edit the letter in src/data/config.js (gitignored)
+const LETTER_PARAGRAPHS = CONFIG.letterParagraphs
 
 // ── Typing text hook ──────────────────────────────────────────────────────────
-// Reveals text character by character; pauses between paragraphs.
-function useTypingEffect(text, speed = 22, startDelay = 0) {
+// Starts typing when `active` flips to true. Uses `done` state as the guard
+// instead of a ref so Strict Mode double-invocation works correctly.
+function useTypingEffect(text, speed = 18, active = false) {
   const [displayed, setDisplayed] = useState('')
   const [done, setDone] = useState(false)
 
   useEffect(() => {
-    setDisplayed('')
-    setDone(false)
+    if (!active || done) return
     let i = 0
-    const timer = setTimeout(() => {
-      const interval = setInterval(() => {
-        i++
-        setDisplayed(text.slice(0, i))
-        if (i >= text.length) {
-          clearInterval(interval)
-          setDone(true)
-        }
-      }, speed)
-      return () => clearInterval(interval)
-    }, startDelay)
-    return () => clearTimeout(timer)
-  }, [text, speed, startDelay])
+    const interval = setInterval(() => {
+      i++
+      setDisplayed(text.slice(0, i))
+      if (i >= text.length) {
+        clearInterval(interval)
+        setDone(true)
+      }
+    }, speed)
+    return () => clearInterval(interval)
+  }, [active, done, text, speed])
 
-  return { displayed, done }
+  // Pin to the full text once done — paragraph never resets
+  return { displayed: done ? text : displayed, done }
 }
 
 // ── Single paragraph with typing effect ──────────────────────────────────────
-function AnimatedParagraph({ text, index, isActive, onDone, isFirst }) {
-  const { displayed, done } = useTypingEffect(
-    isActive ? text : '',
-    18,
-    isFirst ? 600 : 0
-  )
+function AnimatedParagraph({ text, index, isActive, onDone }) {
+  const { displayed, done } = useTypingEffect(text, 18, isActive)
 
+  // onDone is a stable useCallback ref from the parent — safe to omit from deps
   useEffect(() => {
     if (done) onDone()
-  }, [done, onDone])
+  }, [done]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!isActive && displayed === '') return null
-
-  const isLastParagraph = index === LETTER_PARAGRAPHS.length - 1
-  const isGreeting = index === 0
-  const isSignOff = LETTER_PARAGRAPHS[index].startsWith('—')
+  const isGreeting  = index === 0
+  const isSignOff   = text.startsWith('—')
+  const isLast      = index >= LETTER_PARAGRAPHS.length - 3
 
   return (
     <motion.p
@@ -75,16 +59,13 @@ function AnimatedParagraph({ text, index, isActive, onDone, isFirst }) {
           ? 'text-blush-300 font-semibold mb-4 text-lg'
           : isSignOff
           ? 'text-blush-400 font-serif italic text-right mt-6 text-base'
-          : isLastParagraph
+          : isLast
           ? 'text-blush-200 font-serif italic text-lg mt-4'
           : 'text-sm sm:text-base mb-3'
       }`}
     >
       {displayed}
-      {/* Blinking cursor on the active paragraph */}
-      {isActive && !done && (
-        <span className="typing-cursor" aria-hidden="true" />
-      )}
+      {isActive && !done && <span className="typing-cursor" aria-hidden="true" />}
     </motion.p>
   )
 }
@@ -97,21 +78,32 @@ export default function Letter() {
   const [visibleParagraphs, setVisibleParagraphs] = useState([])
 
   // Start the first paragraph once the section scrolls into view
+  // Small delay gives the scroll animation time to settle before typing begins
   useEffect(() => {
     if (isInView && activeParagraph === -1) {
-      setActiveParagraph(0)
-      setVisibleParagraphs([0])
+      const t = setTimeout(() => {
+        setActiveParagraph(0)
+        setVisibleParagraphs([0])
+      }, 600)
+      return () => clearTimeout(t)
     }
   }, [isInView, activeParagraph])
 
   // When a paragraph finishes, reveal the next one
-  const handleParagraphDone = (index) => {
+  const handleParagraphDone = useCallback((index) => {
     const next = index + 1
     if (next < LETTER_PARAGRAPHS.length) {
       setActiveParagraph(next)
       setVisibleParagraphs((prev) => [...prev, next])
     }
-  }
+  }, [])
+
+  // Auto-advance instantly through spacer entries (empty strings)
+  useEffect(() => {
+    if (activeParagraph >= 0 && LETTER_PARAGRAPHS[activeParagraph] === '') {
+      handleParagraphDone(activeParagraph)
+    }
+  }, [activeParagraph, handleParagraphDone])
 
   return (
     <section
@@ -172,14 +164,18 @@ export default function Letter() {
           <div className="space-y-1">
             {LETTER_PARAGRAPHS.map((text, index) =>
               visibleParagraphs.includes(index) ? (
-                <AnimatedParagraph
-                  key={index}
-                  text={text}
-                  index={index}
-                  isActive={activeParagraph === index}
-                  isFirst={index === 0}
-                  onDone={() => handleParagraphDone(index)}
-                />
+                text === '' ? (
+                  <div key={index} className="h-4" />
+                ) : (
+                  <AnimatedParagraph
+                    key={index}
+                    text={text}
+                    index={index}
+                    isActive={activeParagraph === index}
+                    isFirst={index === 0}
+                    onDone={() => handleParagraphDone(index)}
+                  />
+                )
               ) : null
             )}
           </div>

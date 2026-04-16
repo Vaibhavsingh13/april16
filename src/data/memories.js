@@ -1,7 +1,12 @@
 // src/data/memories.js
-// ─── Timeline Events ──────────────────────────────────────────────────────────
-// Replace image paths with your actual images placed in /public/images/
-export const timelineEvents = [
+// ─── Re-exports from private config ──────────────────────────────────────────
+// All content lives in config.js (gitignored). Edit that file to customise.
+import { CONFIG } from './config'
+export const timelineEvents = CONFIG.timelineEvents
+export const galleryPhotos = CONFIG.galleryPhotos
+
+// ── Legacy data kept below for reference only — no longer used ───────────────
+const _timelineEvents_UNUSED = [
   {
     id: 1,
     year: "2012",
@@ -68,10 +73,8 @@ export const timelineEvents = [
   },
 ]
 
-// ─── Gallery Photos ───────────────────────────────────────────────────────────
-// Replace src with your actual image paths inside /public/images/
-// The alt text is also used as the hover caption
-export const galleryPhotos = [
+// ── Legacy data below is for reference only — no longer used ─────────────────
+const _galleryPhotos_UNUSED = [
   {
     id: 1,
     src: "https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=600&q=80",

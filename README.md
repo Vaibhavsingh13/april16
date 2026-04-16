@@ -8,14 +8,14 @@ Created as a personal gift — featuring a hero screen, journey timeline, memory
 
 ## ✨ Features
 
-| Section | What it does |
-|---|---|
-| **Landing** | Full-screen hero with animated heading, floating particles, glowing CTA, and background music support |
-| **Timeline** | Scroll-animated vertical timeline of 8 friendship milestones |
-| **Gallery** | Responsive photo grid with caption overlays and a keyboard-accessible lightbox |
-| **27 Reasons** | One animated card at a time with progress dots and prev/next navigation |
-| **Letter** | Heartfelt letter revealed with a realistic typing animation |
-| **Final** | Confetti celebration screen with a replay button |
+| Section | Status | What it does |
+|---|---|---|
+| **Landing** | ✅ Active | Full-screen hero with animated heading, floating particles, glowing CTA, and background music support |
+| **Timeline** | 🚧 Disabled | Scroll-animated vertical timeline of friendship milestones (commented out) |
+| **Gallery** | 🚧 Disabled | Responsive photo grid with caption overlays and a keyboard-accessible lightbox (commented out) |
+| **27 Reasons** | ✅ Active | One animated card at a time with progress dots and prev/next navigation |
+| **Letter** | ✅ Active | Heartfelt letter revealed with a realistic typing animation |
+| **Final** | ✅ Active | Confetti celebration screen with a replay button |
 
 ---
 
@@ -108,49 +108,47 @@ Your site will be live at:
 
 ## 🎨 Personalisation Guide
 
-### 1. Change the name
+All personalisation is done in a **single file**: `src/data/config.js`.  
+This file is gitignored so your private content is never committed.
 
-Open `src/components/Landing.jsx` and replace `"Your Best Friend"` with the actual name:
+### Setup
 
-```jsx
-<span className="text-white">Happy Birthday, Priya 🎂</span>
+```bash
+# Copy the template and fill in your content
+cp src/data/config.example.js src/data/config.js
 ```
 
-### 2. Update the timeline
-
-Edit `src/data/memories.js` → `timelineEvents` array. Each event has:
+Then edit `src/data/config.js`:
 
 ```js
-{
-  id: 1,
-  year: "2012",
-  title: "The Day We Met",
-  description: "...",
-  image: "/images/your-photo.jpg",  // place images in /public/images/
+export const CONFIG = {
+  birthdayDate: "April 16th, 2026",   // shown on the hero
+  recipientName: "Your Best Friend",   // name in the heading
+  recipientAge: 27,                    // used in "27 Reasons" etc.
+  friendshipYears: "12+",              // hero subtext
+
+  letterParagraphs: [                  // letter typing animation
+    "To my favourite person...",
+    "Add as many paragraphs as you like.",
+    "— Always yours ✨",
+  ],
+
+  finalQuote: "Your closing quote.",
+  finalClosing: "Happy Birthday, [name].",
+
+  timelineEvents: [ ... ],             // (Timeline section — currently disabled)
+  reasons: [ ... ],                    // one per year of life
 }
 ```
 
-### 3. Update gallery photos
-
-Edit `src/data/memories.js` → `galleryPhotos` array.  
-Place your photos in `public/images/` and update the `src` field:
-
-```js
-{ id: 1, src: "/images/photo1.jpg", alt: "Description", caption: "Your caption" }
-```
-
-### 4. Change the letter
-
-Edit the `LETTER_PARAGRAPHS` array in `src/components/Letter.jsx`.
-
-### 5. Edit the reasons
-
-Edit `src/data/reasons.js` — there are 27 entries, one for each year.
-
-### 6. Add background music
+### Add background music
 
 Place an `.mp3` file at `public/music/birthday.mp3`.  
 The audio will start playing after the user's first click (respects browser autoplay policy).
+
+### Re-enable Timeline / Gallery
+
+In `src/App.jsx`, uncomment the relevant imports and `<Timeline />` / `<Gallery />` JSX elements, and add their nav links back to `FloatingNav`.
 
 ---
 
@@ -159,22 +157,24 @@ The audio will start playing after the user's first click (respects browser auto
 ```
 april16/
 ├── public/
-│   ├── images/          ← Your photos go here
-│   └── music/           ← birthday.mp3 goes here
+│   ├── images/              ← Your photos go here
+│   └── music/               ← birthday.mp3 goes here
 ├── src/
 │   ├── components/
-│   │   ├── Landing.jsx  ← Hero screen
-│   │   ├── Timeline.jsx ← Journey timeline
-│   │   ├── Gallery.jsx  ← Photo gallery + lightbox
-│   │   ├── Reasons.jsx  ← 27 reasons cards
-│   │   ├── Letter.jsx   ← Typing letter animation
-│   │   └── Final.jsx    ← Confetti finale
+│   │   ├── Landing.jsx      ← Hero screen
+│   │   ├── Timeline.jsx     ← Journey timeline (disabled)
+│   │   ├── Gallery.jsx      ← Photo gallery + lightbox (disabled)
+│   │   ├── Reasons.jsx      ← Reasons cards
+│   │   ├── Letter.jsx       ← Typing letter animation
+│   │   └── Final.jsx        ← Confetti finale
 │   ├── data/
-│   │   ├── memories.js  ← Timeline events + gallery photos
-│   │   └── reasons.js   ← 27 reasons array
-│   ├── App.jsx          ← Root component + nav
-│   ├── main.jsx         ← React entry point
-│   └── index.css        ← Tailwind + global styles
+│   │   ├── config.example.js  ← Template — safe to commit
+│   │   ├── config.js          ← Your private content (gitignored)
+│   │   ├── memories.js        ← Re-exports timeline/gallery from config
+│   │   └── reasons.js         ← Re-exports reasons from config
+│   ├── App.jsx              ← Root component + floating nav
+│   ├── main.jsx             ← React entry point
+│   └── index.css            ← Tailwind + global styles
 ├── index.html
 ├── vite.config.js
 ├── tailwind.config.js

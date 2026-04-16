@@ -5,6 +5,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { CONFIG } from '../data/config'
 
 // ── Floating particle component ─────────────────────────────────────────────
 function Particle({ x, y, size, duration, delay }) {
@@ -130,7 +131,7 @@ export default function Landing({ onBegin }) {
               variants={itemVariants}
               className="text-blush-300 text-sm font-sans tracking-[0.3em] uppercase mb-6 opacity-80"
             >
-              April 16th, 2026
+              {CONFIG.birthdayDate}
             </motion.p>
 
             {/* Main heading */}
@@ -138,9 +139,9 @@ export default function Landing({ onBegin }) {
               variants={itemVariants}
               className="font-serif text-4xl sm:text-5xl md:text-7xl font-bold leading-tight mb-6"
             >
-              <span className="shimmer-text">Happy 27th Birthday,</span>
+              <span className="shimmer-text">Happy {CONFIG.recipientAge}th Birthday,</span>
               <br />
-              <span className="text-white">Your Best Friend 🎂</span>
+              <span className="text-white">{CONFIG.recipientName} 🎂</span>
             </motion.h1>
 
             {/* Subtext */}
@@ -148,7 +149,7 @@ export default function Landing({ onBegin }) {
               variants={itemVariants}
               className="text-blush-200 font-sans text-lg sm:text-xl md:text-2xl font-light mb-12 opacity-90"
             >
-              12+ years of friendship.&nbsp; A lifetime to go.
+              {CONFIG.friendshipYears} years of friendship.&nbsp; A lifetime to go.
             </motion.p>
 
             {/* CTA Button */}
@@ -162,12 +163,12 @@ export default function Landing({ onBegin }) {
             </motion.button>
 
             {/* Music note hint */}
-            <motion.p
+            {/* <motion.p
               variants={itemVariants}
               className="mt-6 text-blush-400/60 text-xs font-sans tracking-wide"
             >
               🎵 Sound on for the full experience
-            </motion.p>
+            </motion.p> */}
           </div>
 
           {/* Scroll indicator at bottom */}

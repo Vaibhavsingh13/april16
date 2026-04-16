@@ -5,6 +5,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import ReactConfetti from 'react-confetti'
 import { motion } from 'framer-motion'
+import { CONFIG } from '../data/config'
 
 // ── Hook: get window size for confetti ───────────────────────────────────────
 function useWindowSize() {
@@ -147,14 +148,14 @@ export default function Final({ onReplay }) {
           variants={item}
           className="text-blush-200/80 font-sans text-lg sm:text-xl font-light mb-4"
         >
-          Happy 27th Birthday, gorgeous.
+          {CONFIG.finalClosing}
         </motion.p>
 
         <motion.p
           variants={item}
           className="text-blush-300/60 font-serif italic text-base sm:text-lg mb-12"
         >
-          "Rare as a diamond, warm as the sun — that is you."
+          "{CONFIG.finalQuote}"
         </motion.p>
 
         {/* Divider */}
